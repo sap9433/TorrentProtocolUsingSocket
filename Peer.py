@@ -1,20 +1,17 @@
 import socket
 from threading import Thread
-from multiprocessing import Process
+import sys
 import os
 
-TCP_IP = 'localhost'
-TCP_PORT = 9001
-BUFFER_SIZE = 1024
+BUFFER_SIZE = 4096
 
 class ServerModule(Thread):
-    def __init__(self,ip,port,sock, fileName):
+    def __init__(self,peerId, ip, port, sock, fileName):
         Thread.__init__(self)
         self.ip = ip
         self.port = port
         self.sock = sock
         self.fileName = fileName
-        print ("New sender started for client - ",(ip,str(port),fileName))
 
     def run(self):
         filetobesent = open(self.fileName,'rb')
@@ -26,39 +23,38 @@ class ServerModule(Thread):
             if not filepart:
                 filetobesent.close()
                 self.sock.close()
-                print('\n Successfully sent - ' + self.fileName + '\n \n')
+                print('\n ## Successfully sent - ' + self.fileName)
                 break
 
-def receiveConnection():
+def receiveConnection(peerId, ip, port):
     tcpsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     tcpsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    tcpsock.bind((TCP_IP, TCP_PORT))
+    tcpsock.bind((ip, port))
     threads = []
 
     while True:
         tcpsock.listen(5)
-        print ("\nWaiting for peers to request file\n")
-        (conn, (ip,port)) = tcpsock.accept()
+        (conn, (clientip,clientport)) = tcpsock.accept()
         # Accepted connection now First recieve the filename to be sent
-        fileName = conn.recv(1024)
         # connection.recv recives butes. We need to decode it to String.
-        fileName = fileName.decode()
-        print ('Recieved file request from ', (ip,port,fileName))
-        newthread = ServerModule(ip, port, conn, fileName)
+        fileName = (conn.recv(1024)).decode()
+        print ('Recieved file request from ', (clientip, clientport))
+        newthread = ServerModule(peerId, ip, port, conn, fileName)
         newthread.start()
         threads.append(newthread)
+        print("New sender started for client - ", (clientip, str(clientport), fileName))
 
     for t in threads:
         t.join()
 
-def clientModule(clientId):
+def clientModule(peerId):
     TCP_IP = 'localhost'
     TCP_PORT = 9001
-    BUFFER_SIZE = 1024
+    BUFFER_SIZE = 4096
 
     while True:
-        fileName = input("\n\n Please input file name with extension. Or exit() to close.\n\n")
-        fullPath = './' + clientId + '/' + fileName
+        fileName = input("\n ## Please input file name with extension. Or exit() to close.\n")
+        fullPath = './' + peerId + '/' + fileName
         if fileName == 'exit()':
             break
         if os.path.isfile(fullPath):
@@ -68,7 +64,7 @@ def clientModule(clientId):
         sockt.connect((TCP_IP, TCP_PORT))
         sockt.sendall(str.encode(fullPath))
 
-        with open('./' + clientId + '/copyof_' + fileName, 'wb') as f:
+        with open('./' + peerId + '/copyof_' + fileName, 'wb') as f:
             print
             'file opened'
             while True:
@@ -80,15 +76,17 @@ def clientModule(clientId):
                     break
                 # write data to a file
                 f.write(data)
-        print('\n \n Successfully received entire file \n \n')
+        print('\nSuccessfully received entire file')
         # Sockt Close only doesn't ensure immediate release of file desc, hence Shutdown
         sockt.shutdown(socket.SHUT_WR)
         sockt.close()
-        print('\n \n Client closed connection \n \n')
+        print('\n \n Client closed connection')
     print('Client Exited')
 
 if __name__ == '__main__':
-    if 0:
-        receiveConnection()
-    if 1:
-        clientModule(clientId='peer1')
+    try: [module, peerId, ip, port ] = sys.argv[1:]
+    except: pass # Client takes 1 argument so to avoid unpacking error
+    if module == 'server':
+        receiveConnection(peerId, ip, int(port))
+    if module == 'client':
+        clientModule(peerId)
