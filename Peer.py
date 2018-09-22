@@ -1,7 +1,7 @@
 import socket
 from threading import Thread
 from multiprocessing import Process
-
+import os
 
 TCP_IP = 'localhost'
 TCP_PORT = 9001
@@ -17,14 +17,14 @@ class ServerModule(Thread):
         print (" New thread started for "+ip+":"+str(port))
 
     def run(self):
-        f = open(self.fileName,'rb')
+        filetobesent = open(self.fileName,'rb')
         while True:
-            l = f.read(BUFFER_SIZE)
-            while (l):
-                self.sock.send(l)
-                l = f.read(BUFFER_SIZE)
-            if not l:
-                f.close()
+            filepart = filetobesent.read(BUFFER_SIZE)
+            while (filepart):
+                self.sock.send(filepart)
+                filepart = filetobesent.read(BUFFER_SIZE)
+            if not filepart:
+                filetobesent.close()
                 self.sock.close()
                 break
 
@@ -50,32 +50,39 @@ def receiveConnection():
     for t in threads:
         t.join()
 
-def clientModule(clientId, fileName):
+def clientModule(clientId):
     TCP_IP = 'localhost'
     TCP_PORT = 9001
     BUFFER_SIZE = 1024
-
     sockt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sockt.connect((TCP_IP, TCP_PORT))
-    sockt.sendall(str.encode('./'+clientId+'/'+fileName))
-    with open('./' + clientId + '/copyof_' + fileName, 'wb') as f:
-        print
-        'file opened'
-        while True:
-            print('receiving data...')
-            data = sockt.recv(BUFFER_SIZE)
-            print('data=%s', (data))
-            if not data:
-                f.close()
-                print
-                'file close()'
-                break
-            # write data to a file
-            f.write(data)
+    while True:
+        fileName = input("\n\n Please input file name with extension. Or exit() to close.\n\n")
+        fullPath = './' + clientId + '/' + fileName
+        if fileName == 'exit()':
+            break
+        if os.path.isfile(fullPath):
+            print(fileName + ' Already exists for this peer. No need to download from remote \n')
+            #continue
 
-    print('Successfully get the file')
-    sockt.close()
-    print('connection closed')
+        sockt.connect((TCP_IP, TCP_PORT))
+        sockt.sendall(str.encode(fullPath))
+
+        with open('./' + clientId + '/copyof_' + fileName, 'wb') as f:
+            print
+            'file opened'
+            while True:
+                print('receiving data...')
+                data = sockt.recv(BUFFER_SIZE)
+                if not data:
+                    f.close()
+                    print('file closed')
+                    break
+                # write data to a file
+                f.write(data)
+        print('\n \n Successfully received entire file \n \n')
+        sockt.close()
+        print('\n \n Client closed connection \n \n')
+    print('Client Exited')
 
 
 def startConnectionReceiver():
@@ -83,13 +90,8 @@ def startConnectionReceiver():
     serverProcess.start()
     serverProcess.join()
 
-def startClient(clientId, fileName):
-    clientProcess = Process(target=clientModule, args=(clientId, fileName, ))
-    clientProcess.start()
-    clientProcess.join()
-
 if __name__ == '__main__':
     if 0:
         startConnectionReceiver()
     if 1:
-        startClient(clientId='peer1', fileName = 'onekb.txt')
+        clientModule(clientId='peer1')
