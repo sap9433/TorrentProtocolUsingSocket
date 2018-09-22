@@ -81,7 +81,7 @@ def clientModule(clientId, fileName):
 def startConnectionReceiver():
     serverProcess = Process(target=receiveConnection)
     serverProcess.start()
-    serverProcess.join() 
+    serverProcess.join()
 
 def startClient(clientId, fileName):
     clientProcess = Process(target=clientModule, args=(clientId, fileName, ))
