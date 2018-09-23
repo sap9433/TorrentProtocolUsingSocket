@@ -12,7 +12,7 @@
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <module name="CS550PA1" />
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Peer.py" />
-    <option name="PARAMETERS" value="" />
+    <option name="PARAMETERS" value="server peer1 localhost 1025" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />

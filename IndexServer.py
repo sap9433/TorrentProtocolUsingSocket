@@ -19,24 +19,27 @@ if __name__ == '__main__':
         (conn, (clientip,clientport)) = tcpsock.accept()
         # Request have a fixed protocol get|filename or set|filename|host|port
         requestedProtocol = (conn.recv(BUFFER_SIZE)).decode()
+        print('Bro')
+        print(requestedProtocol)
+        print('done')
         [verb, filename ] = requestedProtocol.split('|')[0:2]
         if verb == 'get': #This Block serves file search queries
             fileLocation = 'notfound'
             if filename in fileLocations:
                 fileLocation = random.sample(fileLocations[filename],1)[0] # Static Load-balancer. Randomly selecting peer.
-            print(fileLocation)
             conn.send(str.encode(fileLocation))
             conn.close()
             print("Sent serach result to  - ", (clientip, str(clientport), filename, fileLocation))
         else: #This Block serves Index server update queries
             [filename, host, peerid, port] = requestedProtocol.split('|')[1:]
-            existingList = fileLocations[filename]
             setEntry = host + '|' + peerid + '|' + port
-            if existingList:
-                existingList.add(setEntry)
+            if filename in fileLocations:
+                existing =  fileLocations[filename]
+                existing.add(setEntry)
             else:
                 fileLocations[filename] = {setEntry}
             conn.send(b'Successfully Updated')
             conn.close()
-            print("Updated index  - ", (clientip, str(clientport), filename, fileLocation))
+            print("Updated index  - ", (clientip, str(clientport), filename))
+            print(fileLocations)
 

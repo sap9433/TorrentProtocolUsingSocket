@@ -1,6 +1,7 @@
 import socket
 from threading import Thread
 import sys
+import glob
 import os
 
 INDEX_SERVER_IP='localhost'
@@ -12,6 +13,7 @@ class ServerModule(Thread):
         Thread.__init__(self)
         self.sock = sock
         self.fileName = fileName
+        self.peerId = peerId
 
     def run(self):
         filetobesent = open(self.fileName,'rb')
@@ -31,6 +33,12 @@ def receiveConnection(peerId, ip, port):
     tcpsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     tcpsock.bind((ip, port))
     threads = []
+    # Server started. One time ops. Update all files to index server
+    print('\n Server started. One time ops. Update all files to index server')
+    for file in next(os.walk('./' + peerId + '/'))[2]: #glob.glob('./' + peerId + '/*'):
+        talkToIndexServer(file, 'set', ip, peerId, port)
+
+    print('\n Index server Updation complete')
 
     while True:
         tcpsock.listen(5)
@@ -44,27 +52,32 @@ def receiveConnection(peerId, ip, port):
         newthread.start()
         threads.append(newthread)
         print("New sender started for client - ", (clientip, str(clientport), fileName))
+        # Server started. One time ops. Update all files to index server
 
     for t in threads:
         t.join()
 
-def fetchLocationFromIndexServer(filename):
+def talkToIndexServer(filename, verb,host,peerid,port):
     sockt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sockt.connect((INDEX_SERVER_IP, INDEX_SERVER_PORT))
-    sockt.sendall(str.encode('get|'+filename)) #This is the protocol Index server understands. get|Filename
+    if verb == 'get':
+        sockt.sendall(str.encode('get|'+filename)) #Protocol Index server understands. get|Filename
+    else:
+        # Protocol Index server understands. set|Filename|host|peerid|port
+        sockt.sendall(str.encode('set|' + filename + '|' + host + '|' + peerid + '|'+ str(port)))
     filepath = (sockt.recv(BUFFER_SIZE)).decode()
     return filepath.split('|') if not filepath == 'notfound' else False
 
-def clientModule(peerId):
+def clientModule(peerId,ip,port):
     while True:
         filename = input("\n ## Please input file name with extension. Or exit() to close.\n")
         if filename == 'exit()':
             break
-        #elif os.path.isfile('./' + peerId + '/' + filename):
-         #   print(filename + ' Already exists for this peer. No need to download from remote \n')
-            #continue
+        elif os.path.isfile('./' + peerId + '/' + filename):
+           print(filename + ' Already exists for this peer. No need to download from remote \n')
+           continue
         else:
-            indexServerResponse = fetchLocationFromIndexServer(filename)
+            indexServerResponse = talkToIndexServer(filename, 'get', None, None, None)
             if not indexServerResponse:
                 print('\n Sorry file can not be found in any of the peer')
                 continue
@@ -73,7 +86,7 @@ def clientModule(peerId):
             sockt.connect((serverip, int(serverport)))
             sockt.sendall(str.encode('./' + serverpeerid + '/' + filename))
 
-            with open('./' + peerId + '/copyof_' + filename, 'wb') as f:
+            with open('./' + peerId + '/' + filename, 'wb') as f:
                 while True:
                     print('receiving data...')
                     data = sockt.recv(BUFFER_SIZE)
@@ -85,7 +98,8 @@ def clientModule(peerId):
             # Sockt Close only doesn't ensure immediate release of file desc, hence Shutdown
             sockt.shutdown(socket.SHUT_WR)
             sockt.close()
-            print('\n \n Client closed connection')
+            print('\n Client closed connection. Now updating index server')
+            talkToIndexServer(filename, 'set', ip, peerId, port)
     print('Client Exited')
 
 if __name__ == '__main__':
@@ -94,4 +108,4 @@ if __name__ == '__main__':
     if module == 'server':
         receiveConnection(peerId, ip, int(port))
     if module == 'client':
-        clientModule(peerId)
+        clientModule(peerId,ip, int(port))
