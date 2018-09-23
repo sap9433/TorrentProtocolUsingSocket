@@ -19,9 +19,6 @@ if __name__ == '__main__':
         (conn, (clientip,clientport)) = tcpsock.accept()
         # Request have a fixed protocol get|filename or set|filename|host|port
         requestedProtocol = (conn.recv(BUFFER_SIZE)).decode()
-        print('Bro')
-        print(requestedProtocol)
-        print('done')
         [verb, filename ] = requestedProtocol.split('|')[0:2]
         if verb == 'get': #This Block serves file search queries
             fileLocation = 'notfound'

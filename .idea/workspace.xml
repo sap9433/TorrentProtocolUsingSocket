@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="926b3c01-7e6c-4c2a-bc34-2ff7e3b31fbd" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations/Peer.xml" afterPath="$PROJECT_DIR$/.idea/runConfigurations/Peer.xml" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/IndexServer.py" afterPath="$PROJECT_DIR$/IndexServer.py" />
-      <change beforePath="$PROJECT_DIR$/Peer.py" afterPath="$PROJECT_DIR$/Peer.py" />
-      <change beforePath="$PROJECT_DIR$/peer1/copyof_onekb.txt" afterPath="" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -17,7 +13,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Peer.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Peer.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Peer.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="285">
@@ -29,11 +25,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="IndexServer.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="IndexServer.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/IndexServer.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="293">
-              <caret line="42" column="77" lean-forward="true" selection-start-line="42" selection-start-column="77" selection-end-line="42" selection-end-column="77" />
+            <state relative-caret-position="60">
+              <caret line="20" column="61" lean-forward="false" selection-start-line="20" selection-start-column="61" selection-end-line="20" selection-end-column="61" />
               <folding />
             </state>
           </provider>
@@ -55,8 +51,8 @@
       <find>ip</find>
       <find>TCP_IP</find>
       <find>BUFFER_SIZE</find>
-      <find>port</find>
       <find>print</find>
+      <find>port</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -70,8 +66,8 @@
         <option value="$PROJECT_DIR$/Driver.py" />
         <option value="$PROJECT_DIR$/peer1/onekb.txt" />
         <option value="$PROJECT_DIR$/peer1/tenkb.txt" />
-        <option value="$PROJECT_DIR$/IndexServer.py" />
         <option value="$PROJECT_DIR$/Peer.py" />
+        <option value="$PROJECT_DIR$/IndexServer.py" />
       </list>
     </option>
   </component>
@@ -255,11 +251,6 @@
           <line>20</line>
           <option name="timeStamp" value="5" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/IndexServer.py</url>
-          <line>22</line>
-          <option name="timeStamp" value="6" />
-        </line-breakpoint>
       </breakpoints>
       <option name="time" value="7" />
     </breakpoint-manager>
@@ -405,14 +396,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/IndexServer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="293">
-          <caret line="42" column="77" lean-forward="true" selection-start-line="42" selection-start-column="77" selection-end-line="42" selection-end-column="77" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Peer.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="285">
@@ -420,6 +403,14 @@
           <folding>
             <element signature="e#0#13#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/IndexServer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="20" column="61" lean-forward="false" selection-start-line="20" selection-start-column="61" selection-end-line="20" selection-end-column="61" />
+          <folding />
         </state>
       </provider>
     </entry>
